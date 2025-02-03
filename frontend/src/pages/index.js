@@ -20,7 +20,7 @@ const ProfileDetails = ({ userDetails }) => (
     <h2 className="text-xl font-semibold text-gray-200">{userDetails.fname} {userDetails.lname}</h2>
     <p className="text-gray-400">{userDetails.email}</p>
     <div className="mt-4 text-gray-300 text-sm space-y-2">
-      <p><strong>Age:</strong> {userDetails.age}</p>
+      <p><strong>Age:</strong> {userDetails.age.length === 0 ? "idk" : userDetails.age}</p>
       <p><strong>Contact:</strong> {userDetails.contact}</p>
     </div>
   </div>
