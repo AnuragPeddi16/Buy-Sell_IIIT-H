@@ -98,9 +98,9 @@ const markOrderAsCompleted = async (req, res) => {
         const updatedOrder = await Order.findByIdAndUpdate(orderid, { status: "completed" }, { new: true });
         if (!updatedOrder) return res.status(404).json({ message: 'Order not found' });
         
-        res.status(200).json(updatedOrder);
+        res.status(200).json({success: true});
 
-    } else res.status(401).json({message: 'Invalid OTP'});
+    } else res.json({success: false, message: 'Invalid OTP'});
 
 }
 

@@ -41,7 +41,7 @@ app.use((err, req, res, next) => {
 
 connectDB();
 
-app.use('/api', apiRoutes);
+app.use('/api', apiRoutes); // all api routes mounted here
 
 app.get("/", (req, res) => {
 

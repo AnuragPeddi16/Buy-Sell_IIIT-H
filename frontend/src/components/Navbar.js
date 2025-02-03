@@ -34,6 +34,7 @@ export default function Navbar() {
                 <Navlink route="/" label="Home" currentPath={router.pathname} />
                 <Navlink route="/store" label="Store" currentPath={router.pathname} />
                 <Navlink route="/orders" label="Orders" currentPath={router.pathname} />
+                <Navlink route="/deliver" label="Deliver" currentPath={router.pathname} />
             </ul>
 
             {isLoggedIn && (
