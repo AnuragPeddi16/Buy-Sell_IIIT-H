@@ -1,6 +1,14 @@
 const User = require('../models/User');
 const errorWrapper = require('../utils/errorWrapper');
 const bcrypt = require('bcryptjs');
+const {generateToken} = require('../utils/authToken');
+
+const getIdfromEmail = async (email) => {
+
+    const user = await User.findOne({ email: email }).lean();
+    return user._id;
+
+}
 
 // get user details by user ID - only the user in question can access
 const getPrivateUserDetails = async (req, res) => {
@@ -8,7 +16,8 @@ const getPrivateUserDetails = async (req, res) => {
     /* const userid = req.params.userId;
     if (userid != req.user.id) return res.status(403).json({message: 'Access denied.'}); // check if user is authorized */
 
-    const userid = req.user.id;
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
 
     const user = await User.findById(userid).lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -37,7 +46,7 @@ const getPublicUserDetails = async (req, res) => {
 
 };
 
-const checkPassword = async (req, res) => {
+const loginUser = async (req, res) => {
 
     const login = req.body;
     const email = login.email;
@@ -48,7 +57,12 @@ const checkPassword = async (req, res) => {
     const isMatch = await bcrypt.compare(login.password, user.password);
     if (!isMatch) return res.status(400).json({message: "Email or password incorrect"});
 
-    res.status(200).json({message: "Success"});
+    const token = generateToken(user);
+
+    res.cookie("authToken", token, {
+            httpOnly: true, secure: false, sameSite: "Lax", maxAge: 30 * 24 * 60 * 60 * 1000,
+        })
+        .send({ message: "Login successful", user });
 
 }
 
@@ -62,10 +76,16 @@ const addnewUser = async (req, res) => {
         const newUser = new User(user);
         const savedUser = await newUser.save();
 
-        res.status(201).json(savedUser);
+        const token = generateToken(user);
+
+        res.cookie("authToken", token, {
+                httpOnly: true, secure: false, sameSite: "Lax", maxAge: 30 * 24 * 60 * 60 * 1000,
+            })
+            .send({ message: "Login successful", user });
 
     } catch (error) {
 
+        // mongodb error for failing uniqueness
         if (error.code === 11000) {
 
             res.status(400).json({ message: 'Email already in use' });
@@ -80,10 +100,17 @@ const addnewUser = async (req, res) => {
 
 };
 
+const logoutUser = async (req, res) => {
+
+    res.clearCookie("authToken").send({ message: "Logged out successfully" });
+
+}
+
 // Update user details
 const updateUserDetails = async (req, res) => {
 
-    const userid = req.user.id;
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
 
     const user = await User.findByIdAndUpdate(userid, req.body, { new: true });
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -94,7 +121,8 @@ const updateUserDetails = async (req, res) => {
 
 const updatePassword = async (req, res) => {
 
-    const userid = req.user.id;
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
     const passwords = req.body;
 
     const user = await User.findById(userid);
@@ -112,7 +140,8 @@ const updatePassword = async (req, res) => {
 
 const getCartItems = async (req, res) => {
 
-    const userid = req.user.id;
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
 
     const user = await User.findById(userid).populate('cart_items', 'name price').lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -125,7 +154,8 @@ const getCartItems = async (req, res) => {
 
 const deleteFromCart = async (req, res) => {
 
-    const userid = req.user.id;
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
     const itemid = req.params.itemId;
 
     let user;
@@ -143,8 +173,9 @@ const deleteFromCart = async (req, res) => {
 module.exports = {
     getPrivateUserDetails: errorWrapper(getPrivateUserDetails),
     getPublicUserDetails: errorWrapper(getPublicUserDetails),
-    checkPassword: errorWrapper(checkPassword),
+    loginUser: errorWrapper(loginUser),
     addnewUser: addnewUser,
+    logoutUser: errorWrapper(logoutUser),
     updateUserDetails: errorWrapper(updateUserDetails),
     updatePassword: errorWrapper(updatePassword),
     getCartItems: errorWrapper(getCartItems),

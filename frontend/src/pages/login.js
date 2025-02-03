@@ -1,36 +1,22 @@
-// pages/login.js
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from 'axios';
+import { useAuth } from "../utils/AuthContext";
 
-export default function LoginPage() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const {login} = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
+    const success = await login({ email: email, password: password });
 
-        const login = {
-            email: email,
-            password: password
-        }
-
-        const token = "rerere";
-        
-        const response = await axios.post(process.env.BACKEND_URL + "/api/users/login", login, {
-            headers: { Authorization: "Bearer " + token },
-        });
-
-        router.push('/');
-    
-    } catch (error) {
-        console.log(error);
-        setErrorMessage(error.response.data.message || "Internal Server Error");
-    }
+    if (success) router.push("/");
+    else setErrorMessage("Invalid email or password");
 
   };
 
@@ -86,3 +72,5 @@ export default function LoginPage() {
     </div>
   );
 };
+
+export default LoginPage;

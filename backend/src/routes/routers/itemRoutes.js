@@ -1,5 +1,5 @@
 const express = require('express');
-const authToken = require('../../utils/authToken');
+const {authToken} = require('../../utils/authToken');
 
 const {
     getItemDetails,

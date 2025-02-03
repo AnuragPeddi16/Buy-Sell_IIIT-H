@@ -1,16 +1,22 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const generateToken = (user) => {
+    return jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+};
+
 // verify the jwt token and extract user details
 const authToken = (req, res, next) => {
 
-    /* const token = req.header('Authorization')?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Access Denied. No token provided.' }); */
+    const token = req.cookies.authToken;
+    if (!token) return res.status(401).json({ message: 'Access Denied. No token provided.' });
 
     try {
 
-        /* const decoded = jwt.verify(token, process.env.JWT_SECRET); */
-        req.user = /* decoded */ {id: "6796193d557e110a6e5cbb9d"};
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
 
     } catch (error) {
@@ -21,4 +27,9 @@ const authToken = (req, res, next) => {
 
 };
 
-module.exports = authToken;
+module.exports = {
+    
+    generateToken,
+    authToken
+    
+};

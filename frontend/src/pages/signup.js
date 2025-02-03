@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from 'axios';
+import { useAuth } from "../utils/AuthContext";
 
 const InputField = ({ label, type, name, value, onChange, placeholder, required = false }) => {
     return (
@@ -30,7 +30,7 @@ const ErrorMessage = ({ message }) => {
     );
 } 
   
-export default function SignUpPage() {
+function SignUpPage() {
     const [user, setUser] = useState({
         fname: "",
         lname: "",
@@ -40,6 +40,8 @@ export default function SignUpPage() {
         password: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
+
+    const { signup } = useAuth();
     const router = useRouter();
   
     const handleChange = (e) => {
@@ -70,20 +72,10 @@ export default function SignUpPage() {
             return;
         }
     
-        try {
+        const success = await signup(user);
 
-            const token = "rerere";
-            
-            const response = await axios.post(process.env.BACKEND_URL + "/api/users/details", user, {
-                headers: { Authorization: "Bearer " + token },
-            });
-    
-            router.push('/');
-        
-        } catch (error) {
-            console.log(error);
-            setErrorMessage(error.response.data.message || "Internal Server Error");
-        }
+        if (success) router.push("/");
+        else setErrorMessage("User already exists");
     };
   
     return (
@@ -168,3 +160,7 @@ export default function SignUpPage() {
         </div>
     );
 }
+
+
+
+export default SignUpPage;

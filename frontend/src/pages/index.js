@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from '../utils/axiosConfig';
 import Navbar from "../components/Navbar";
+import withAuth from "../utils/withAuth";
 
 const ErrorMessage = ({ message }) => (
   message ? <p className="text-white font-semibold bg-red-800 p-2 rounded-md mb-4">{message}</p> : null
@@ -69,7 +70,7 @@ const ChangePasswordForm = ({ passwords, handleChange, handleSubmit, handleCance
   </form>
 );
 
-export default function Dashboard() {
+function Dashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [userDetails, setUserDetails] = useState({});
@@ -85,13 +86,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(process.env.BACKEND_URL + "/api/users/details", {
-          headers: { Authorization: "Bearer " + token },
-        });
+        const response = await axios.get("/api/users/details");
         setUserDetails(response.data);
         setFormData({ ...response.data });
       } catch (err) {
-        setError(err.response ? err.response.data : err.message);
+        setError(err.response ? err.response.data.message : err.message);
       } finally {
         setLoading(false);
       }
@@ -147,9 +146,7 @@ export default function Dashboard() {
     setValidationError("");
 
     try {
-      const response = await axios.put(process.env.BACKEND_URL + "/api/users/details", formData, {
-        headers: { Authorization: "Bearer " + token },
-      });
+      const response = await axios.put("/api/users/details", formData);
       setUserDetails(response.data);
       setFormData(response.data);
       setValidationError("");
@@ -166,9 +163,7 @@ export default function Dashboard() {
       setValidationError("New password and confirm password do not match");
       return;
     }
-    axios.put(process.env.BACKEND_URL + "/api/users/password", passwords, {
-      headers: { Authorization: "Bearer " + token },
-    }).then(() => {
+    axios.put("/api/users/password", passwords).then(() => {
       setShowPasswordForm(false);
       setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
       setValidationError("");
@@ -221,3 +216,8 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+
+
+export default withAuth(Dashboard);
