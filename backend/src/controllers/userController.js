@@ -22,8 +22,6 @@ const getPrivateUserDetails = async (req, res) => {
     const user = await User.findById(userid).lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    delete user.cart_items;
-
     res.json(user);
 
 };
@@ -152,6 +150,30 @@ const getCartItems = async (req, res) => {
 
 };
 
+const addToCart = async (req, res) => {
+
+    const useremail = req.user.email;
+    const userid = await getIdfromEmail(useremail);
+
+    const itemid = req.body.itemId;
+
+    const user = await User.findById(userid).populate('cart_items', 'name price');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.cart_items.includes(itemid)) {
+
+        res.status(409).json({ message: "Item is already in the cart." });
+        return;
+
+    }
+
+    user.cart_items.push(itemid);
+    await user.save();
+
+    res.send({message: "Success"});
+
+};
+
 const deleteFromCart = async (req, res) => {
 
     const useremail = req.user.email;
@@ -179,5 +201,6 @@ module.exports = {
     updateUserDetails: errorWrapper(updateUserDetails),
     updatePassword: errorWrapper(updatePassword),
     getCartItems: errorWrapper(getCartItems),
+    addToCart: errorWrapper(addToCart),
     deleteFromCart: errorWrapper(deleteFromCart)
 };

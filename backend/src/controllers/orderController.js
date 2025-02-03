@@ -1,25 +1,32 @@
 const Order = require("../models/Order");
-/* const Item = require("../models/Item"); */
+const User = require("../models/User");
 const bcrypt = require('bcryptjs');
 const errorWrapper = require('../utils/errorWrapper');
+
+const getIdfromEmail = async (email) => {
+
+    const user = await User.findOne({ email: email }).lean();
+    return user._id;
+
+}
 
 // get details of all orders placed/received by a user (except yet to be delivered ones)
 const getAllOrdersbyUser = async (req, res) => {
 
-    const userid = req.user.id;
+    const userid = await getIdfromEmail(req.user.email);
 
     const pendingOrders = await Order.find({ buyer: userid, status: 'pending' })
-                                    .populate('item', 'name price')
+                                    .populate('items', '_id name price')
                                     .populate('seller', 'fname lname')
                                     .lean();
 
     const boughtOrders = await Order.find({ buyer: userid, status: 'completed' })
-                                    .populate('item', 'name price')
+                                    .populate('items', '_id name price')
                                     .populate('seller', 'fname lname')
                                     .lean();
 
     const soldOrders = await Order.find({ seller: userid, status: 'completed' })
-                                    .populate('item', 'name price')
+                                    .populate('items', '_id name price')
                                     .populate('buyer', 'fname lname')
                                     .lean();
       
@@ -34,10 +41,10 @@ const getAllOrdersbyUser = async (req, res) => {
 // get details of all orders yet to be delivered by user
 const getPendingOrders = async (req, res) => {
 
-    const userid = req.user.id;
+    const userid = await getIdfromEmail(req.user.email);
 
     const pendingOrders = await Order.find({ seller: userid, status: 'pending' })
-                                    .populate('item', 'name price')
+                                    .populate('items', '_id name price')
                                     .populate('buyer', 'fname lname')
                                     .lean();
       
@@ -48,12 +55,13 @@ const getPendingOrders = async (req, res) => {
 const addnewOrders = async (req, res) => {
 
     const orders = req.body;
-    const buyerid = req.user.id;
+    const buyerid = await getIdfromEmail(req.user.email);
 
     for (const order of orders) {
 
         order.buyer = buyerid;
-        order.otp = await bcrypt.hash(order.otp, 10);
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        order.otp = await bcrypt.hash(otp, 10);
 
     }
 
@@ -61,6 +69,19 @@ const addnewOrders = async (req, res) => {
     res.json(result);
 
 };
+
+const regenerateOTP = async (req, res) => {
+
+    const orderid = req.params.orderId;
+
+    const order = await Order.findById(orderid);
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    order.otp = await bcrypt.hash(otp, 10);
+    order.save();
+
+    res.json({otp});
+
+}
 
 // mark as completed if otp matches
 const markOrderAsCompleted = async (req, res) => {
@@ -87,5 +108,6 @@ module.exports = {
     getAllOrdersbyUser: errorWrapper(getAllOrdersbyUser),
     getPendingOrders: errorWrapper(getPendingOrders),
     addnewOrders: errorWrapper(addnewOrders),
+    regenerateOTP: errorWrapper(regenerateOTP),
     markOrderAsCompleted: errorWrapper(markOrderAsCompleted)
 };

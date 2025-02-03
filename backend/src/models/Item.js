@@ -6,7 +6,6 @@ const itemSchema = new mongoose.Schema({
     description: { type: String, maxlength: 1000 },
     categories: [{ type: String }],
     seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    /* sellername: { type: String, required: true }, */
     listedAt: { type: Date, default: Date.now() }
 });
 

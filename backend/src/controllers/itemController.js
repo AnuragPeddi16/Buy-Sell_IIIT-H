@@ -1,6 +1,13 @@
 const Item = require("../models/Item");
-/* const User = require("../models/User"); */
+const User = require("../models/User");
 const errorWrapper = require('../utils/errorWrapper');
+
+const getIdfromEmail = async (email) => {
+
+    const user = await User.findOne({ email: email }).lean();
+    return user._id;
+
+}
 
 // get details of one item
 const getItemDetails = async (req, res) => {
@@ -26,7 +33,7 @@ const getAllItems = async (req, res) => {
 const addnewItem = async (req, res) => {
 
     const item = req.body;
-    item.seller = req.user.id;
+    item.seller = await getIdfromEmail(req.user.email);
 
     /* const seller = await User.findById(item.seller).select("fname lname").lean();
     item.sellername = seller.lname ? seller.fname + " " + seller.lname : seller.fname; */

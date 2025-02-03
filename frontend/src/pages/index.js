@@ -2,15 +2,10 @@ import { useState, useEffect } from "react";
 import axios from '../utils/axiosConfig';
 import Navbar from "../components/Navbar";
 import withAuth from "../utils/withAuth";
+import LoadingMessage from "../components/LoadingMessage";
 
 const ErrorMessage = ({ message }) => (
   message ? <p className="text-white font-semibold bg-red-800 p-2 rounded-md mb-4">{message}</p> : null
-);
-
-const LoadingMessage = () => (
-  <div className="flex items-center justify-center h-full">
-    <p className="text-xl font-semibold text-gray-300">Loading...</p>
-  </div>
 );
 
 const ProfileDetails = ({ userDetails }) => (
@@ -21,7 +16,7 @@ const ProfileDetails = ({ userDetails }) => (
     <h2 className="text-xl font-semibold text-gray-200">{userDetails.fname} {userDetails.lname}</h2>
     <p className="text-gray-400">{userDetails.email}</p>
     <div className="mt-4 text-gray-300 text-sm space-y-2">
-      <p><strong>Age:</strong> {userDetails.age.length === 0 ? "idk" : userDetails.age}</p>
+      <p><strong>Age:</strong> {userDetails.age ? userDetails.age : "idk"}</p>
       <p><strong>Contact:</strong> {userDetails.contact}</p>
     </div>
   </div>
@@ -35,7 +30,7 @@ const ProfileForm = ({ formData, handleChange }) => (
           {field === "fname" ? "First Name" : field === "lname" ? "Last Name" : field.charAt(0).toUpperCase() + field.slice(1)}
         </label>
         <input
-          type={field === "email" ? "email" : "text"}
+          type={field === "email" ? "email" : field === "age" ? "number" : "text"}
           name={field}
           value={formData[field] || ""}
           onChange={handleChange}
@@ -80,8 +75,6 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [validationError, setValidationError] = useState("");
   const [saving, setSaving] = useState(false);
-
-  const token = "rererererere";
 
   useEffect(() => {
     const fetchUserData = async () => {

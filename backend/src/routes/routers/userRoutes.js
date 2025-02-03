@@ -10,6 +10,7 @@ const {
     updateUserDetails,
     updatePassword,
     getCartItems,
+    addToCart,
     deleteFromCart
 } = require('../../controllers/userController');
 
@@ -22,6 +23,7 @@ router.post('/login', loginUser) // POST /api/users/login (no auth for login)
 router.post('/logout', authToken, logoutUser) // POST /api/users/logout
 router.put('/password', authToken, updatePassword) // PUT /api/users/password
 router.get('/cart/all', authToken, getCartItems); // GET /api/users/cart/all
+router.post('/cart/add', authToken, addToCart); // GET /api/users/cart/add
 router.delete('/cart/delete/:itemId', authToken, deleteFromCart); // DELETE /api/users/cart/delete/:itemId (itemId == 'all' to clear cart)
 router.get('/:userId', authToken, getPublicUserDetails); // GET /api/users/:userId
 
