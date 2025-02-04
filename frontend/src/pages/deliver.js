@@ -67,7 +67,7 @@ export default function DeliverItems() {
 
   const renderOrders = (orders) => {
     if (orders.length === 0)
-      return <p className="text-gray-400 mt-6">No orders to deliver.</p>;
+      return <p className="text-gray-400">No orders to deliver.</p>;
 
     return (
       <div className='w-4/6'>
@@ -140,8 +140,8 @@ export default function DeliverItems() {
   return (
     <div className="bg-gray-800 min-h-screen text-gray-200">
       <Navbar />
-      <div className="flex flex-col items-center p-4 w-full">
-        <h2 className="text-xl font-semibold mb-5">Deliver Items</h2>
+      <div className="flex flex-col items-center p-6 w-full">
+        <h2 className="text-2xl font-bold mb-6">Deliver Items</h2>
         {renderOrders(pendingOrders)}
       </div>
     </div>

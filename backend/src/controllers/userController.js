@@ -141,7 +141,17 @@ const getCartItems = async (req, res) => {
     const useremail = req.user.email;
     const userid = await getIdfromEmail(useremail);
 
-    const user = await User.findById(userid).populate('cart_items', 'name price').lean();
+    const user = await User.findById(userid)
+        .populate({
+            path: "cart_items",
+            select: "_id name price",
+            populate: {
+                path: "seller",
+                select: "_id fname lname",
+                model: "User"
+            }
+        })
+        .lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const cart_items = user.cart_items;
