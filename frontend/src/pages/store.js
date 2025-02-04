@@ -188,6 +188,13 @@ function SearchItemsPage() {
 
         )}
       </main>
+
+      <Link href="/list">
+        <button className="fixed bottom-6 right-6 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-all transform hover:scale-110">
+          + List Item
+        </button>
+      </Link>
+
     </div>
   );
 }

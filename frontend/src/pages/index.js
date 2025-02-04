@@ -3,6 +3,7 @@ import axios from '../utils/axiosConfig';
 import Navbar from "../components/Navbar";
 import withAuth from "../utils/withAuth";
 import LoadingMessage from "../components/LoadingMessage";
+import Link from "next/link";
 
 const ErrorMessage = ({ message }) => (
   message ? <p className="text-white font-semibold bg-red-800 p-2 rounded-md mb-4">{message}</p> : null
@@ -42,7 +43,7 @@ const ProfileForm = ({ formData, handleChange }) => (
 );
 
 const ChangePasswordForm = ({ passwords, handleChange, handleSubmit, handleCancel, validationError }) => (
-  <form onSubmit={handleSubmit} className="bg-gray-900 p-6 rounded-lg shadow-md">
+  <form onSubmit={handleSubmit} className="bg-gray-900 rounded-lg shadow-md">
     <h3 className="text-xl font-semibold text-gray-300 mb-4">Change Password</h3>
     {['oldPassword', 'newPassword', 'confirmPassword'].map((field) => (
       <div className="mb-4" key={field}>
@@ -166,7 +167,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 text-gray-200">
+    <div className="h-screen h-full bg-gray-800 text-gray-200">
       <Navbar />
       {error ? <ErrorMessage message={error} /> : (
         <main className="p-6 max-w-xl mx-auto">
@@ -191,11 +192,11 @@ function Dashboard() {
                   {isEditing ? <ProfileForm formData={formData} handleChange={handleChange} /> : <ProfileDetails userDetails={userDetails} />}
                   <ErrorMessage message={validationError} />
                   <div className="flex justify-between mt-6">
-                    <button onClick={handleEditToggle} className="bg-blue-500 text-white py-2 px-4 rounded">{saving ? "Saving..." : isEditing ? "Save" : "Edit Profile"}</button>
+                    <button onClick={handleEditToggle} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">{saving ? "Saving..." : isEditing ? "Save" : "Edit Profile"}</button>
                     {isEditing ? (
-                      <button onClick={handleCancel} className="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
+                      <button onClick={handleCancel} className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Cancel</button>
                     ) : (
-                      <button onClick={() => setShowPasswordForm(true)} className="bg-red-500 text-white py-2 px-4 rounded">Change Password</button>
+                      <button onClick={() => setShowPasswordForm(true)} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Change Password</button>
                     )}
                   </div>
                 </>
@@ -204,6 +205,15 @@ function Dashboard() {
             )}
 
           </div>
+
+          {!isEditing && !showPasswordForm && (
+            <div className="flex items-center gap-4 mt-20 justify-center">
+              <Link href="/store" className="bg-blue-500 text-white text-xl py-4 px-6 rounded hover:bg-blue-600 transition-all transform hover:scale-105">Buy 💵</Link>
+              <span className="text-gray-400">OR</span>
+              <Link href="/list" className="bg-blue-500 text-white text-xl py-4 px-6 rounded hover:bg-blue-600 transition-all transform hover:scale-105">Sell 🤑</Link>
+            </div>
+          )}
+
         </main>
       )}
     </div>
