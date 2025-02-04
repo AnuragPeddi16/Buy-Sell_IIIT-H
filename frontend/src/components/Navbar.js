@@ -33,9 +33,10 @@ export default function Navbar() {
             <ul className="flex items-center space-x-4">
                 <Navlink route="/" label="Home" currentPath={router.pathname} />
                 <Navlink route="/store" label="Store" currentPath={router.pathname} />
+                <Navlink route="/cart" label="Cart" currentPath={router.pathname} />
                 <Navlink route="/orders" label="Orders" currentPath={router.pathname} />
                 <Navlink route="/deliver" label="Deliver" currentPath={router.pathname} />
-                <Navlink route="/cart" label="Cart" currentPath={router.pathname} />
+                <Navlink route="/support" label="Support" currentPath={router.pathname} />
             </ul>
 
             {isLoggedIn && (
