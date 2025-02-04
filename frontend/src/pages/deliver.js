@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
+import LoadingMessage from '../components/LoadingMessage';
 
 export default function DeliverItems() {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [otpInputs, setOtpInputs] = useState({});
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -15,6 +17,8 @@ export default function DeliverItems() {
         setPendingOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchOrders();
@@ -142,7 +146,7 @@ export default function DeliverItems() {
       <Navbar />
       <div className="flex flex-col items-center p-6 w-full">
         <h2 className="text-2xl font-bold mb-6">Deliver Items</h2>
-        {renderOrders(pendingOrders)}
+        {loading ? <LoadingMessage /> : renderOrders(pendingOrders)}
       </div>
     </div>
   );

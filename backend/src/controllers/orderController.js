@@ -1,8 +1,8 @@
 const Order = require("../models/Order");
 const User = require("../models/User");
+const Item = require("../models/Item");
 const bcrypt = require('bcryptjs');
 const errorWrapper = require('../utils/errorWrapper');
-const { set } = require("mongoose");
 
 const getIdfromEmail = async (email) => {
 
@@ -58,14 +58,24 @@ const addnewOrders = async (req, res) => {
     const orders = req.body.orders;
     const buyerid = await getIdfromEmail(req.user.email);
 
+    let items = [];
+
     for (const order of orders) {
 
         order.buyer = buyerid;
         order.status = "pending";
+
+        items.push.apply(items, order.items);
+
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         order.otp = await bcrypt.hash(otp, 10);
 
     }
+
+    await Item.updateMany(
+        { _id: { $in: items } },  // Find all documents with these IDs
+        { $set: { ordered: true } }
+    );
 
     const result = await Order.insertMany(orders);
     await User.findByIdAndUpdate(buyerid, { $set: { cart_items: [] } }, { new: true });

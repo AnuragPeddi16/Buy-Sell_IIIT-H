@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
+import LoadingMessage from '../components/LoadingMessage';
 
 export default function OrdersHistory() {
   const [selectedTab, setSelectedTab] = useState('pending');
@@ -9,6 +10,7 @@ export default function OrdersHistory() {
   const [boughtOrders, setBoughtOrders] = useState([]);
   const [soldOrders, setSoldOrders] = useState([]);
   const [otp, setOtp] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -21,6 +23,8 @@ export default function OrdersHistory() {
         setSoldOrders(sold);
       } catch (error) {
         console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchOrders();
@@ -175,19 +179,19 @@ export default function OrdersHistory() {
           {selectedTab === 'pending' && (
             <div>
               <h2 className="text-xl font-semibold mb-5">Pending Orders</h2>
-              {renderOrders(pendingOrders, true, true)}
+              {loading ? <LoadingMessage /> : renderOrders(pendingOrders, true, true)}
             </div>
           )}
           {selectedTab === 'bought' && (
             <div>
               <h2 className="text-xl font-semibold mb-5">Bought Items</h2>
-              {renderOrders(boughtOrders, true, false)}
+              {loading ? <LoadingMessage /> : renderOrders(boughtOrders, true, false)}
             </div>
           )}
           {selectedTab === 'sold' && (
             <div>
               <h2 className="text-xl font-semibold mb-5">Sold Items</h2>
-              {renderOrders(soldOrders, false, false)}
+              {loading ? <LoadingMessage /> : renderOrders(soldOrders, false, false)}
             </div>
           )}
         </div>

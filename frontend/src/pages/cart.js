@@ -43,17 +43,29 @@ export default function CartPage() {
   const placeOrder = async () => {
     if (cartItems.length === 0) return;
 
-    // Group items by seller
-    const orders = cartItems.reduce((acc, item) => {
+    let orders = {};
+
+    cartItems.forEach((item) => {
+      if (!orders[item._id]) orders[item.seller._id] = { seller: item.seller._id, items: [], amount: 0 };
+      orders[item.seller._id].items.push(item._id);
+      orders[item.seller._id].amount += item.price;
+    });
+
+    /* // Group items by seller
+    const orders2 = cartItems.reduce((acc, item) => {
       if (!acc[item.seller]) {
         acc[item.seller] = { seller: item.seller, items: [], amount: 0 };
       }
       acc[item.seller].items.push(item._id);
       acc[item.seller].amount += item.price;
       return acc;
-    }, {});
+    }, {}); */
+
+    console.log(orders);
 
     const orderList = Object.values(orders);
+
+    console.log(orderList);
 
     try {
       await axios.post("/api/orders/add", { orders: orderList });

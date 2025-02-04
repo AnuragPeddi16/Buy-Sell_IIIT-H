@@ -26,7 +26,7 @@ const getAllItems = async (req, res) => {
 
     const userid = await getIdfromEmail(req.user.email);
 
-    const items = await Item.find({ seller: {$ne: userid} }).populate('seller', 'fname lname').lean();
+    const items = await Item.find({ seller: {$ne: userid}, ordered: false }).populate('seller', '_id fname lname').lean();
     items.forEach(item => delete item["description"]);
     res.json(items);
 

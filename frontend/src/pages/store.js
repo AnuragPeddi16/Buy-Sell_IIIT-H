@@ -22,6 +22,8 @@ function SearchItemsPage() {
         const response = await axios.get("/api/items/all");
         setItems(response.data);
 
+        console.log(response.data);
+
         let cats_temp = {};
         for (const item of response.data) {
 

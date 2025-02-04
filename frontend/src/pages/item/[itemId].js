@@ -102,9 +102,11 @@ export default function ItemDetailsPage() {
                         </div>
 
                         <button
+                            disabled={item.ordered}
                             onClick={isInCart ? handleRemoveFromCart : handleAddToCart}
                             className={`mt-6 w-full text-white font-bold py-2 px-4 rounded transition duration-200 ${
-                                isInCart
+                                item.ordered ? "bg-gray-700 text-gray-600 cursor-not-allowed"
+                                : isInCart
                                     ? "bg-red-500 hover:bg-red-600"
                                     : "bg-blue-500 hover:bg-blue-600"
                             }`}
